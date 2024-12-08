@@ -1,0 +1,1 @@
+name:str,age:int,gen:list,doorkey:bytes,date:datetime

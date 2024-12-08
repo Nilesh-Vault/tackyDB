@@ -1,6 +1,6 @@
-# AI generated tests for checking my function
 import os
 import unittest
+from unittest import mock  # Correct import for mocking
 
 from src.DatabaseCore import DatabaseCore  # Correct import for DatabaseCore
 
@@ -128,6 +128,38 @@ class TestDatabaseCore(unittest.TestCase):
             "Error: Table name must be alphanumeric and cannot contain special characters",
         )
 
+    # Tests for Database Deletion
+    def test_delete_database_success(self):
+        """Test deleting a database successfully."""
+        DatabaseCore.createDatabase(self.db_name)
+        result = DatabaseCore.deleteDB(self.db_name)
+        self.assertIn(f"Database '{self.db_name}' and all its contents have been successfully deleted.", result)
+        self.assertFalse(os.path.exists(self.db_path))  # Database should be deleted
+
+    def test_delete_database_failure_not_found(self):
+        """Test trying to delete a non-existent database."""
+        result = DatabaseCore.deleteDB("nonexistent_db")
+        self.assertEqual(result, "Error: Database 'nonexistent_db' does not exist.")
+
+    def test_delete_database_failure_invalid_name(self):
+        """Test database deletion with invalid name."""
+        DatabaseCore.createDatabase(self.db_name)
+        result = DatabaseCore.deleteDB("invalid@db")  # Invalid name with special characters
+        self.assertEqual(result, "Error: Database name must be alphanumeric and cannot contain special characters")
+
+    def test_delete_database_failure_user_cancelled(self):
+        """Test when user cancels database deletion."""
+        DatabaseCore.createDatabase(self.db_name)
+        with mock.patch('builtins.input', return_value="wrongname"):
+            result = DatabaseCore.deleteDB(self.db_name)
+        self.assertIn("Error: Database deletion aborted. The names do not match.", result)
+
+    def test_delete_database_failure_permission_denied(self):
+        """Test failure case for database deletion due to permission errors."""
+        DatabaseCore.createDatabase(self.db_name)
+        with mock.patch("shutil.rmtree", side_effect=PermissionError("Permission denied")):
+            result = DatabaseCore.deleteDB(self.db_name)
+        self.assertIn("Error: Failed to delete the database", result)
 
 if __name__ == "__main__":
     unittest.main()

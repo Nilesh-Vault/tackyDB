@@ -97,6 +97,9 @@ class DatabaseCore:
 
         if not os.path.exists(db_path):
             return f"Error: Database '{db_name}' does not exist."
+        
+        if not db_name.isalnum():
+            return "Error: Database name must be alphanumeric and cannot contain special characters"
 
         confirmation = input(f"Are you sure you want to delete the database '{db_name}'? Type '{db_name}' to confirm: ")
         if confirmation != db_name:
