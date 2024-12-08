@@ -44,3 +44,9 @@ if os.name == "nt":
 else:
     print("To activate the virtual environment, run:")
     print(f"    source {activate_script}")
+
+# Create Database folder for storing files
+try:
+    os.mkdir("database")
+except Exception as e:
+    print(f"Error creating database folder: {e}")
