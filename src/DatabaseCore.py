@@ -22,7 +22,7 @@ class DatabaseCore:
             return f"Error: {str(e)}\n"
 
     @staticmethod
-    def createTable(db_name: str, table_name: str, columns: dict) -> str:
+    def createTable(db_name: str, table_name: str, columns: dict, primary_key: str = None) -> str:
         root_path: str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         db_path: str = os.path.join(root_path, f"database/{db_name.lower()}")
 
@@ -49,7 +49,7 @@ class DatabaseCore:
             "bool",
             "bytes",
             "list",
-            "datetime",
+            "date",
         ]
         
         for column_name, column_type in columns.items():
@@ -59,12 +59,19 @@ class DatabaseCore:
                 return f"Error: Invalid Column TypeName '{column_type}' for '{column_name}' must be in {valid_types}"
             if column_type not in valid_types:
                 return f"Error: Invalid Column Type '{column_type}' for '{column_name}' must be in {valid_types}"
+        
+        if primary_key is not None:
+            if not primary_key.isalnum():
+                return f"Error: Invalid Primary Key name '{primary_key}' must be alphanumeric"
+            if primary_key.lower() not in columns:
+                return f"Error: Primary Key '{primary_key}' not found in '{columns}'"
 
         try:
             with open(table_path, "w", newline="") as file:
                 writer = csv.writer(file)
                 header = [
-                    f"{col_name}:{col_type}" for col_name, col_type in columns.items()
+                    f"{col_name}:{col_type}:pk" if col_name == primary_key.lower() else f"{col_name}:{col_type}"
+                    for col_name, col_type in columns.items()
                 ]
                 writer.writerow(header)
             return f"Table '{table_name}' created successfully at {db_path}"
