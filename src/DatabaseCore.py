@@ -1,5 +1,5 @@
-import os
 import csv
+import os
 
 
 class DatabaseCore:
@@ -48,13 +48,14 @@ class DatabaseCore:
             "list",
             "datetime",
         ]
+        
         for column_name, column_type in columns.items():
             if not column_name.isalnum():
-                return f"Error: Invalid Column name '{column_name} must be alphanumeric"
+                return f"Error: Invalid Column name '{column_name}' must be alphanumeric"
             if not column_type.isalpha():
-                return f"Error: Invalid Column TypeName '{column_type}' for '{column_name}' must be in '{valid_types}'"
+                return f"Error: Invalid Column TypeName '{column_type}' for '{column_name}' must be in {valid_types}"
             if column_type not in valid_types:
-                return f"Error: Invalid Column Type '{column_type}' for '{column_name}' must be in '{valid_types}'"
+                return f"Error: Invalid Column Type '{column_type}' for '{column_name}' must be in {valid_types}"
 
         try:
             with open(table_path, "w", newline="") as file:
