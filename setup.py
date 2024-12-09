@@ -21,7 +21,7 @@ else:  # Unix or MacOS
     activate_script = os.path.join(venv_path, "bin", "activate")
 
 # Install required packages
-requirements = ["ruff", "ruff-lsp"]
+requirements = ["ruff", "ruff-lsp", "tabulate"]
 
 # Install packages using pip
 pip_executable = (
