@@ -1,6 +1,7 @@
 import csv
 import os
 import shutil
+import json
 
 
 class DatabaseCore:
@@ -69,11 +70,19 @@ class DatabaseCore:
         try:
             with open(table_path, "w", newline="") as file:
                 writer = csv.writer(file)
-                header = [
-                    f"{col_name}:{col_type}:pk" if col_name == primary_key.lower() else f"{col_name}:{col_type}"
-                    for col_name, col_type in columns.items()
-                ]
+                header = []
+                for col_names, col_types in columns.items():
+                    if col_names == primary_key.lower():
+                        header.append(f"{col_names}:{col_types}:pk")
+                    else:
+                        header.append(f"{col_names}:{col_types}")
                 writer.writerow(header)
+            
+            if primary_key is not None:
+                map_file_path = os.path.join(db_path, f"{table_name.lower()}_map.json")
+                if not os.path.exists(map_file_path):
+                    with open(map_file_path, "w") as map_file:
+                        json.dump({}, map_file)
             return f"Table '{table_name}' created successfully at {db_path}"
         except Exception as e:
             return f"Error:Failed to create table '{table_name}\n{str(e)}\n"
